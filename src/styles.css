@@ -176,3 +176,10 @@ td.wrap{overflow-wrap:anywhere;max-width:340px}
 .login-card{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:16px}
 @media (max-width:560px){.steps-meta{margin-left:0;width:100%}}
 td.mono{white-space:nowrap}
+td.mono.wrap{white-space:normal;overflow-wrap:anywhere;word-break:break-all}
+table.sources{table-layout:fixed;width:100%}
+table.sources th:nth-child(1),table.sources td:nth-child(1){width:30%}
+table.sources th:last-child,table.sources td:last-child{width:22%}
+table.sources td{vertical-align:top}
+table.sources td.wrap{max-width:none}
+table.sources .hash{white-space:normal;word-break:break-all}

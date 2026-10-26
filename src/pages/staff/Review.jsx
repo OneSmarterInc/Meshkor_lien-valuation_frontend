@@ -82,7 +82,7 @@ function LineDetail({ l, payer }) {
         <div><span className="label">Hospital cost</span><div className="num">{money(l.cost)}</div></div>
       </div>
       {l.sources?.length > 0 && (
-        <div className="tbl-wrap"><table>
+        <div className="tbl-wrap"><table className="sources">
           <thead><tr><th>Source</th><th>File</th><th>SHA-256</th></tr></thead>
           <tbody>{l.sources.map((s, i) => <tr key={i}><td>{s.label}</td><td className="mono wrap">{s.file_name}</td><td className="hash">{shortHash(s.sha256)}</td></tr>)}</tbody>
         </table></div>

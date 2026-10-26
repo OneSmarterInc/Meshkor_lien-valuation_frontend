@@ -47,7 +47,7 @@ function ReportDoc({ c, r }) {
       </table></div>
 
       <h3>3. Sources</h3>
-      <div className="tbl-wrap"><table>
+      <div className="tbl-wrap"><table className="sources">
         <thead><tr><th>Data</th><th>File</th><th>Dated</th><th>SHA-256</th></tr></thead>
         <tbody>{(r.sources || []).map((s, i) => <tr key={i}><td>{s.data}</td><td className="mono wrap">{s.file_name}</td><td className="mono">{date(s.dated)}</td><td className="hash">{s.sha256}</td></tr>)}</tbody>
       </table></div>
