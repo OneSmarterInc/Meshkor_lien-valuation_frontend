@@ -44,10 +44,13 @@ function Flags({ c, setCase }) {
   );
 }
 
-function Totals({ t }) {
+function Totals({ t, eob }) {
   if (!t) return null;
+  const et = eob?.totals || {};
   const rows = [
     { label: "Billed", value: t.billed, display: money(t.billed), muted: true },
+    ...(et.allowed != null ? [{ label: "Allowed (EOB)", value: et.allowed, display: money(et.allowed) }] : []),
+    ...(et.paid != null ? [{ label: "Paid (EOB)", value: et.paid, display: money(et.paid) }] : []),
     { label: "Insurer rate", value: t.payer_rate, display: money(t.payer_rate) },
     { label: "Median (commercial)", value: t.median, display: money(t.median) },
     { label: "Cash price", value: t.cash, display: t.cash == null ? "not posted" : money(t.cash) },
@@ -70,6 +73,34 @@ function Totals({ t }) {
   );
 }
 
+function EobPanel({ c }) {
+  const e = c.eob;
+  const uploaded = c.files?.some((f) => f.kind === "eob");
+  if (!e) {
+    return uploaded ? <div className="callout bad"><strong>EOB not read.</strong> See the flag above for the reason. The bill is priced without it.</div> : null;
+  }
+  const t = e.totals || {};
+  const vs = e.vs_price_file;
+  const rows = [
+    ["Billed (on the EOB)", t.billed], ["Network discount", t.discount], ["Not covered", t.not_covered],
+    ["Allowed by the insurer", t.allowed, true], ["Deductible", t.deductible], ["Copay", t.copay], ["Coinsurance", t.coinsurance],
+    ["Patient share", t.patient], ["Paid by the insurer", t.paid, true],
+  ].filter((r) => r[1] != null);
+  return (
+    <div className="panel">
+      <div className="row between"><h2>Insurer's EOB</h2><Pill tone="p-info">{e.level === "stay" ? `Whole stay${e.ms_drg ? ` · DRG ${e.ms_drg}` : ""}` : `${e.lines_matched} of ${e.bill_lines} lines matched`}</Pill></div>
+      <p className="note">{e.payer || "Insurer not named"}{e.plan && e.plan !== e.payer ? ` · ${e.plan}` : ""}{e.claim_number ? ` · claim ${e.claim_number}` : ""}
+        {e.date_from ? ` · ${date(e.date_from)}${e.date_to && e.date_to !== e.date_from ? ` to ${date(e.date_to)}` : ""}` : ""}
+        {e.method && e.method !== "text" ? ` · read by ${e.method.includes("ocr") ? "OCR" : "Word"}` : ""}</p>
+      <div className="tbl-wrap"><table><tbody>
+        {rows.map(([k, v, strong]) => <tr key={k}><td>{strong ? <strong>{k}</strong> : k}</td><td className="r num">{strong ? <strong>{money(v)}</strong> : money(v)}</td></tr>)}
+      </tbody></table></div>
+      {vs && <p className="note">On the same {e.level === "stay" ? "stay" : "lines"}, the insurer allowed {money(vs.allowed)}; the hospital's posted rate with this insurer is {money(vs.posted)} ({vs.pct > 0 ? "+" : ""}{vs.pct} %).</p>}
+      <p className="note">Member name and ID are not stored. Compare the amounts with the EOB before you build the report.</p>
+    </div>
+  );
+}
+
 function LineDetail({ l, payer }) {
   if (!l) return null;
   return (
@@ -81,6 +112,13 @@ function LineDetail({ l, payer }) {
         <div><span className="label">Medicare</span><div className="num">{l.medicare_status === "packaged" ? "packaged" : money(l.medicare)}</div><div className="note">{l.medicare_source}</div></div>
         <div><span className="label">Hospital cost</span><div className="num">{money(l.cost)}</div></div>
       </div>
+      {(l.eob_allowed != null || l.eob_paid != null) && (
+        <div className="grid4">
+          <div><span className="label">Allowed (EOB)</span><div className="num">{money(l.eob_allowed)}</div></div>
+          <div><span className="label">Paid (EOB)</span><div className="num">{money(l.eob_paid)}</div></div>
+          <div><span className="label">Patient share (EOB)</span><div className="num">{money(l.eob_patient)}</div></div>
+        </div>
+      )}
       {l.sources?.length > 0 && (
         <div className="tbl-wrap"><table className="sources"><colgroup><col className="c-data" /><col className="c-file" /><col className="c-hash" /></colgroup>
           <thead><tr><th>Source</th><th>File</th><th>SHA-256</th></tr></thead>
@@ -97,6 +135,7 @@ function Lines({ c }) {
   const { data, error, loading, reload } = useLoad(() => Cases.lines(c.id, basis), [c.id, basis]);
   const payer = c.payer_name || "Insurer";
   const cur = data?.find((l) => l.line_no === sel) || data?.[0];
+  const hasEob = !!data?.some((l) => l.eob_allowed != null);
   return (
     <>
       <div className="row between">
@@ -112,7 +151,7 @@ function Lines({ c }) {
       {data && (data.length === 0 ? <Empty title="No lines read from this bill yet." /> : (
         <>
           <div className="tbl-wrap"><table>
-            <thead><tr><th>#</th><th>Date</th><th>Rev</th><th>Code</th><th>Description</th><th className="r">Units</th><th className="r">Billed</th><th className="r">{payer}</th><th className="r" title="Median of the hospital's commercial insurer rates">Median (comm.)</th><th className="r">Cash</th><th className="r">Medicare</th><th className="r">Cost</th><th className="r">Billed ÷ rate</th></tr></thead>
+            <thead><tr><th>#</th><th>Date</th><th>Rev</th><th>Code</th><th>Description</th><th className="r">Units</th><th className="r">Billed</th>{hasEob && <th className="r" title="What the insurer allowed on this line, from its EOB">Allowed (EOB)</th>}<th className="r">{payer}</th><th className="r" title="Median of the hospital's commercial insurer rates">Median (comm.)</th><th className="r">Cash</th><th className="r">Medicare</th><th className="r">Cost</th><th className="r">Billed ÷ rate</th></tr></thead>
             <tbody>
               {data.map((l) => (
                 <tr key={l.line_no} className={`click ${cur?.line_no === l.line_no ? "sel" : ""}`} tabIndex={0}
@@ -124,6 +163,7 @@ function Lines({ c }) {
                   <td>{l.description}{l.status?.startsWith("unpriced") && <> <Pill tone="p-bad">unpriced</Pill></>}</td>
                   <td className="r num">{l.units}</td>
                   <td className="r num">{money(l.charge)}</td>
+                  {hasEob && <td className="r num">{money(l.eob_allowed)}</td>}
                   <td className="r num">{money(l.payer_rate)}{l.payer_rate_is_estimate && <span className="note"> est.</span>}</td>
                   <td className="r num">{money(l.median)}</td>
                   <td className="r num">{l.cash == null ? <span className="note">n/p</span> : money(l.cash)}</td>
@@ -136,6 +176,7 @@ function Lines({ c }) {
             <tfoot><tr>
               <td colSpan="6">Total ({data.length} lines)</td>
               <td className="r num">{money(sum(data, "charge"))}</td>
+              {hasEob && <td className="r num">{money(sum(data, "eob_allowed"))}</td>}
               <td className="r num">{money(sum(data, "payer_rate"))}</td>
               <td className="r num">{money(sum(data, "median"))}</td>
               <td className="r num">–</td>
@@ -208,8 +249,9 @@ export default function Review() {
           <HospitalBar m={c.hospital_match} />
           <div className="grid2">
             <Flags c={c} setCase={setData} />
-            {c.setting === "inpatient" ? <Totals t={c.stay?.values ? { ...c.stay.values, cash: c.totals?.cash } : c.totals} /> : <Totals t={c.totals} />}
+            {c.setting === "inpatient" ? <Totals t={c.stay?.values ? { ...c.stay.values, cash: c.totals?.cash } : c.totals} eob={c.eob} /> : <Totals t={c.totals} eob={c.eob} />}
           </div>
+          <EobPanel c={c} />
           {c.setting === "inpatient" && c.stay && <Stay c={c} setCase={setData} />}
           <Lines c={c} />
           <div className="row end">

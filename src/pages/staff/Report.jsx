@@ -8,6 +8,7 @@ import CaseHeader from "./CaseHeader.jsx";
 
 function ReportDoc({ c, r }) {
   const payer = c.payer_name || "insurer";
+  const hasEob = (r.lines || []).some((l) => l.eob_allowed != null);
   return (
     <article className="doc">
       <div>
@@ -34,12 +35,19 @@ function ReportDoc({ c, r }) {
           {r.stay.p10 != null ? ` Posted rates for this DRG range from ${money(r.stay.p10)} (10th percentile) to ${money(r.stay.p90)} (90th).` : ""}</p>
       )}
 
+      {r.eob && (
+        <p><b>Insurer's EOB.</b> {r.eob.payer || "The insurer"}{r.eob.claim_number ? `, claim ${r.eob.claim_number}` : ""}:
+          {" "}allowed {money(r.eob.totals?.allowed)}, paid {money(r.eob.totals?.paid)}{r.eob.totals?.patient != null ? `, patient share ${money(r.eob.totals.patient)}` : ""}.
+          {" "}{r.eob.level === "stay" ? `The EOB shows the stay as one line${r.eob.ms_drg ? ` (MS-DRG ${r.eob.ms_drg})` : ""}.` : `${r.eob.lines_matched} of ${r.eob.bill_lines} bill lines matched to the EOB.`}</p>
+      )}
+
       <h3>2. Line by line</h3>
       <div className="tbl-wrap"><table>
-        <thead><tr><th>#</th><th>Code</th><th>Service</th><th className="r">Billed</th><th className="r">{payer}</th><th className="r">Medicare</th><th className="r">Cost</th></tr></thead>
+        <thead><tr><th>#</th><th>Code</th><th>Service</th><th className="r">Billed</th>{hasEob && <th className="r">Allowed (EOB)</th>}<th className="r">{payer}</th><th className="r">Medicare</th><th className="r">Cost</th></tr></thead>
         <tbody>{(r.lines || []).map((l) => (
           <tr key={l.line_no}><td className="mono">{l.line_no}</td><td className="mono">{l.hcpcs}</td><td>{l.description}</td>
             <td className="r num">{money(l.charge)}</td>
+            {hasEob && <td className="r num">{money(l.eob_allowed)}</td>}
             <td className="r num">{money(l.payer_rate)}{l.payer_rate_is_estimate ? " (est.)" : ""}</td>
             <td className="r num">{l.medicare_status === "packaged" && !l.medicare ? "packaged" : money(l.medicare)}</td>
             <td className="r num">{money(l.cost)}</td></tr>
