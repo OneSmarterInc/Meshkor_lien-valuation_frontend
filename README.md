@@ -134,6 +134,7 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 - A firm user sees the values, lines and report only after MeshKor releases the case. Before that, the case shows **In progress** (or **Needs attention**).
 - **"not posted"** means the hospital posts no cash price. It is never shown as $0.
 - **"packaged"** means Medicare pays that line inside another line.
+- **Median (commercial)** is the middle of the hospital's rates with **commercial insurers only** (employer, individual and ACA exchange plans, PPO networks). Medicare, Medicare Advantage and Medicaid plans are left out, because Medicare is its own column.
 
 ---
 

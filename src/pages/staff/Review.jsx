@@ -49,7 +49,7 @@ function Totals({ t }) {
   const rows = [
     { label: "Billed", value: t.billed, display: money(t.billed), muted: true },
     { label: "Insurer rate", value: t.payer_rate, display: money(t.payer_rate) },
-    { label: "Median rate", value: t.median, display: money(t.median) },
+    { label: "Median (commercial)", value: t.median, display: money(t.median) },
     { label: "Cash price", value: t.cash, display: t.cash == null ? "not posted" : money(t.cash) },
     { label: "Hospital cost", value: t.cost, display: money(t.cost) },
     { label: "Medicare", value: t.medicare, display: money(t.medicare) },
@@ -77,7 +77,7 @@ function LineDetail({ l, payer }) {
       <h2>Line {l.line_no} · {l.hcpcs || "no code"} · {l.description}</h2>
       <div className="grid4">
         <div><span className="label">{payer} rate</span><div className="num">{money(l.payer_rate)}{l.payer_rate_is_estimate && <span className="note"> est.</span>}</div></div>
-        <div><span className="label">Median · 10th–90th</span><div className="num">{money(l.median)}</div><div className="note num">{money(l.p10)} – {money(l.p90)}</div></div>
+        <div><span className="label" title="Commercial insurers only: Medicare, Medicare Advantage and Medicaid plans are left out">Median (commercial) · 10th–90th</span><div className="num">{money(l.median)}</div><div className="note num">{money(l.p10)} – {money(l.p90)}</div></div>
         <div><span className="label">Medicare</span><div className="num">{l.medicare_status === "packaged" ? "packaged" : money(l.medicare)}</div><div className="note">{l.medicare_source}</div></div>
         <div><span className="label">Hospital cost</span><div className="num">{money(l.cost)}</div></div>
       </div>
@@ -112,7 +112,7 @@ function Lines({ c }) {
       {data && (data.length === 0 ? <Empty title="No lines read from this bill yet." /> : (
         <>
           <div className="tbl-wrap"><table>
-            <thead><tr><th>#</th><th>Date</th><th>Rev</th><th>Code</th><th>Description</th><th className="r">Units</th><th className="r">Billed</th><th className="r">{payer}</th><th className="r">Median</th><th className="r">Cash</th><th className="r">Medicare</th><th className="r">Cost</th><th className="r">Billed ÷ rate</th></tr></thead>
+            <thead><tr><th>#</th><th>Date</th><th>Rev</th><th>Code</th><th>Description</th><th className="r">Units</th><th className="r">Billed</th><th className="r">{payer}</th><th className="r" title="Median of the hospital's commercial insurer rates">Median (comm.)</th><th className="r">Cash</th><th className="r">Medicare</th><th className="r">Cost</th><th className="r">Billed ÷ rate</th></tr></thead>
             <tbody>
               {data.map((l) => (
                 <tr key={l.line_no} className={`click ${cur?.line_no === l.line_no ? "sel" : ""}`} tabIndex={0}
