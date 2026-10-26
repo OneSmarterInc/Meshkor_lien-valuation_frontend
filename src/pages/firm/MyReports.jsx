@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Cases } from "../../api/endpoints.js";
-import { Empty, ErrorBox, Loading, useLoad } from "../../components/States.jsx";
+import { BUSY, Empty, ErrorBox, Loading, useLoad, usePoll } from "../../components/States.jsx";
 import { ActionButton, Pill } from "../../components/UI.jsx";
 import { useToast } from "../../components/Toast.jsx";
 import { money, range, statusFirm } from "../../utils/format.js";
@@ -62,7 +62,8 @@ export default function MyReports() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
-  const { data, error, loading, reload } = useLoad(() => Cases.list({ page, search: q }), [page, q]);
+  const { data, error, loading, reload, refresh } = useLoad(() => Cases.list({ page, search: q }), [page, q]);
+  usePoll(!!data?.results?.some((c) => BUSY.includes(c.status)), refresh, 5000);   // the status updates by itself
 
   return (
     <section className="view">

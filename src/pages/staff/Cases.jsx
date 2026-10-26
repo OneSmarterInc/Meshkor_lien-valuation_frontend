@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cases as API } from "../../api/endpoints.js";
-import { Empty, ErrorBox, Loading, useLoad } from "../../components/States.jsx";
+import { BUSY, Empty, ErrorBox, Loading, useLoad, usePoll } from "../../components/States.jsx";
 import { Pill, Stat } from "../../components/UI.jsx";
 import { int, money, range, statusStaff } from "../../utils/format.js";
 import { Pager } from "../firm/MyReports.jsx";
@@ -20,6 +20,7 @@ export default function Cases() {
   const stats = useLoad(() => API.stats(), []);
   const list = useLoad(() => API.list({ status, page, search: q }), [status, page, q]);
   const s = stats.data;
+  usePoll(!!list.data?.results?.some((c) => BUSY.includes(c.status)) || !!s?.processing, () => { list.refresh(); stats.refresh(); }, 5000);
 
   return (
     <section className="view">

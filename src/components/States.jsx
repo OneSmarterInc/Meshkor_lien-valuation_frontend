@@ -31,6 +31,24 @@ export function useLoad(fn, deps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   useEffect(() => { alive.current = true; run(); return () => { alive.current = false; }; }, [run]);
+  // Fetch again without the "Loading" screen (for automatic refresh). A failed refresh keeps the old data.
+  const refresh = useCallback(() => {
+    fn().then((data) => alive.current && setState({ data, error: null, loading: false }), () => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
   const setData = (d) => setState((s) => ({ ...s, data: typeof d === "function" ? d(s.data) : d }));
-  return { ...state, reload: run, setData };
+  return { ...state, reload: run, refresh, setData };
+}
+
+export const BUSY = ["uploaded", "processing"];
+
+// Call fn every `ms` while `active` is true (a bill is being priced in the background).
+export function usePoll(active, fn, ms = 3000) {
+  const f = useRef(fn);
+  f.current = fn;
+  useEffect(() => {
+    if (!active) return undefined;
+    const t = setInterval(() => { if (!document.hidden) f.current(); }, ms);
+    return () => clearInterval(t);
+  }, [active, ms]);
 }

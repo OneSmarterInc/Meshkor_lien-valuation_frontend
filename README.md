@@ -85,7 +85,7 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 
 **Step 2: Review** (MeshKor reviewer)
 
-1. Open **Cases**, then the case. The Review page shows the hospital that was found, the price file used, the bill total against each benchmark, every line, and the flags.
+1. Open **Cases**, then the case. While the bill is still being priced, the page shows **Still processing** and fills in by itself (it checks every 3 seconds; **My reports** and **Cases** check every 5 seconds while a case is processing). The Review page shows the hospital that was found, the price file used, the bill total against each benchmark, every line, and the flags.
 2. **Needs a look:** resolve each flag that says "check", with a short note.
 3. For an inpatient stay: confirm the **MS-DRG**, or type a different one. The backend prices the stay again at once.
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Cases } from "../../api/endpoints.js";
-import { Empty, ErrorBox, Loading, useLoad } from "../../components/States.jsx";
+import { BUSY, Empty, ErrorBox, Loading, useLoad, usePoll } from "../../components/States.jsx";
 import { ActionButton, Bars, FileName, Hash, Pill } from "../../components/UI.jsx";
 import { date, money, ratio } from "../../utils/format.js";
 import CaseHeader from "./CaseHeader.jsx";
@@ -191,17 +191,18 @@ function Stay({ c, setCase }) {
 
 export default function Review() {
   const { id } = useParams();
-  const { data: c, error, loading, reload, setData } = useLoad(() => Cases.get(id), [id]);
+  const { data: c, error, loading, reload, refresh, setData } = useLoad(() => Cases.get(id), [id]);
+  usePoll(!!c && BUSY.includes(c.status), refresh);           // fills in by itself when the pricing ends
   if (loading && !c) return <Loading text="Loading the case" />;
   if (error) return <ErrorBox error={error} onRetry={reload} />;
-  const processing = ["uploaded", "processing"].includes(c.status);
+  const processing = BUSY.includes(c.status);
 
   return (
     <section className="view">
       <CaseHeader c={c} step="review" intro="The system has read the bill, found the hospital and priced every line. Check the flagged items, then build the report." />
       {processing ? (
-        <div className="panel"><h2>Still processing</h2><p>The bill is being read and priced. This page fills in when it is done.</p>
-          <div className="row"><button className="btn" onClick={reload}>Check again</button></div></div>
+        <div className="panel"><h2>Still processing</h2><p>The bill is being read and priced. A scanned bill or a photo can take a minute. This page fills in by itself when it is done.</p>
+          <div className="row"><span className="spinner" aria-hidden="true" /><span className="note">{c.status === "uploaded" ? "Waiting to start" : "Reading and pricing"}</span></div></div>
       ) : (
         <>
           <HospitalBar m={c.hospital_match} />
