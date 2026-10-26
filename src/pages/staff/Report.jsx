@@ -24,9 +24,15 @@ function ReportDoc({ c, r }) {
       <h3>1. Summary</h3>
       <div className="tbl-wrap"><table>
         <thead><tr><th>Benchmark</th><th className="r">Total</th><th className="r">% of billed</th></tr></thead>
-        <tbody>{(r.summary || []).map((s) => <tr key={s.benchmark}><td>{s.benchmark}</td><td className="r num">{money(s.total)}</td><td className="r num">{s.pct_of_billed == null ? "–" : `${Math.round(s.pct_of_billed)}%`}</td></tr>)}</tbody>
+        <tbody>{(r.summary || []).map((s) => <tr key={s.key || s.benchmark}><td>{s.benchmark}{s.note && <div className="note">{s.note}</div>}</td><td className="r num">{money(s.total)}</td><td className="r num">{s.pct_of_billed == null ? "–" : `${Math.round(s.pct_of_billed)}%`}</td></tr>)}</tbody>
       </table></div>
       {r.summary_text && <p>{r.summary_text}</p>}
+      {r.stay?.ms_drg && (
+        <p><b>Inpatient stay.</b> Valued as one MS-DRG: {r.stay.ms_drg} {r.stay.drg_title}{r.stay.los_days != null ? `, ${r.stay.los_days} days` : ""}.
+          {" "}DRG {r.stay.drg_confirmed ? "confirmed by the reviewer" : "as shown on the bill, not yet confirmed"}.
+          {r.stay.medicare_source ? ` Medicare: ${r.stay.medicare_source}.` : ""}
+          {r.stay.p10 != null ? ` Posted rates for this DRG range from ${money(r.stay.p10)} (10th percentile) to ${money(r.stay.p90)} (90th).` : ""}</p>
+      )}
 
       <h3>2. Line by line</h3>
       <div className="tbl-wrap"><table>
@@ -35,7 +41,7 @@ function ReportDoc({ c, r }) {
           <tr key={l.line_no}><td className="mono">{l.line_no}</td><td className="mono">{l.hcpcs}</td><td>{l.description}</td>
             <td className="r num">{money(l.charge)}</td>
             <td className="r num">{money(l.payer_rate)}{l.payer_rate_is_estimate ? " (est.)" : ""}</td>
-            <td className="r num">{l.medicare_status === "packaged" ? "packaged" : money(l.medicare)}</td>
+            <td className="r num">{l.medicare_status === "packaged" && !l.medicare ? "packaged" : money(l.medicare)}</td>
             <td className="r num">{money(l.cost)}</td></tr>
         ))}</tbody>
       </table></div>

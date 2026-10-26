@@ -99,7 +99,7 @@ export default function MyReports() {
                         <ActionButton action={() => Cases.downloadPdf(c)} okText={(n) => `Downloaded ${n}`}>⬇ PDF</ActionButton>
                         <ActionButton action={() => Cases.downloadCsv(c)} okText={(n) => `Downloaded ${n}`}>⬇ CSV</ActionButton>
                       </div>
-                    ) : <span className="note">Usually within 1 business day</span>}</td>
+                    ) : <span className="note">{c.status === "error" ? "MeshKor is looking at this bill and will contact you if anything is needed" : "Usually within 1 business day"}</span>}</td>
                   </tr>
                 );
               })}

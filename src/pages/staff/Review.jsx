@@ -58,7 +58,14 @@ function Totals({ t }) {
     <div className="panel">
       <h2>Bill total against each benchmark</h2>
       <Bars rows={rows} />
-      {t.payer_rate ? <p className="note">Billed is {ratio(t.billed, t.payer_rate)} the hospital's own insurer rate.</p> : null}
+      {t.payer_rate ? (
+        <p className="note">
+          {t.coverage?.payer_rate_billed != null && t.coverage.payer_rate < 100
+            ? `On the ${t.coverage.lines_with?.payer_rate ?? "–"} lines with an insurer rate (${t.coverage.payer_rate} % of billed charges), billed is ${ratio(t.coverage.payer_rate_billed, t.payer_rate)} the hospital's own insurer rate.`
+            : `Billed is ${ratio(t.billed, t.payer_rate)} the hospital's own insurer rate.`}
+          {t.payer_rate_is_estimate ? " Part of the insurer rate is an estimate." : ""}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -85,7 +92,7 @@ function LineDetail({ l, payer }) {
 }
 
 function Lines({ c }) {
-  const [basis, setBasis] = useState("service_date");
+  const [basis, setBasis] = useState(c.totals?.basis === "estimate" ? "estimate" : "service_date");
   const [sel, setSel] = useState(null);
   const { data, error, loading, reload } = useLoad(() => Cases.lines(c.id, basis), [c.id, basis]);
   const payer = c.payer_name || "Insurer";
@@ -96,10 +103,10 @@ function Lines({ c }) {
         <h2>Bill lines</h2>
         <div className="seg" role="group" aria-label="Rate basis">
           <button type="button" className={basis === "service_date" ? "on" : ""} onClick={() => setBasis("service_date")}>Rate on service date</button>
-          <button type="button" className={basis === "estimate" ? "on" : ""} onClick={() => setBasis("estimate")}>Estimate (× Medicare)</button>
+          <button type="button" className={basis === "estimate" ? "on" : ""} onClick={() => setBasis("estimate")}>Estimate (nearest price file)</button>
         </div>
       </div>
-      {basis === "estimate" && <div className="callout">Estimate: the hospital's current {payer} ÷ Medicare ratio × Medicare's rate on the service date. Use it when no price file covers the service date. The report labels these values as estimates.</div>}
+      {basis === "estimate" && <div className="callout">Estimate: no price file covers the service date, so the {payer} rate, median and cash come from the hospital's nearest price file. Medicare and cost are still for the service date. The report labels these values as estimates.</div>}
       <ErrorBox error={error} onRetry={reload} />
       {loading && !data && <Loading text="Pricing lines" />}
       {data && (data.length === 0 ? <Empty title="No lines read from this bill yet." /> : (
@@ -134,7 +141,7 @@ function Lines({ c }) {
               <td className="r num">–</td>
               <td className="r num">{money(sum(data, "medicare"))}</td>
               <td className="r num">{money(sum(data, "cost"))}</td>
-              <td className="r num">{ratio(sum(data, "charge"), sum(data, "payer_rate"))}</td>
+              <td className="r num">{ratio(sum(data.filter((l) => l.payer_rate != null), "charge"), sum(data, "payer_rate"))}</td>
             </tr></tfoot>
           </table></div>
           <p className="note">Click a line to see its sources. n/p = not posted by the hospital · pkg = packaged into another Medicare payment.</p>
@@ -154,7 +161,7 @@ function Stay({ c, setCase }) {
       <div className="panel">
         <div className="row between"><h2>DRG {s.ms_drg}</h2><Pill tone={s.drg_confirmed ? "p-good" : "p-warn"}>{s.drg_confirmed ? "Confirmed" : "To confirm"}</Pill></div>
         <p>{s.drg_title}</p>
-        <p className="note">From the {s.drg_source === "grouper" ? "CMS grouper (the bill showed no DRG)" : "bill"} · {s.los_days} day{s.los_days === 1 ? "" : "s"}</p>
+        <p className="note">From the {s.drg_source === "grouper" ? "CMS grouper (the bill showed no DRG)" : s.drg_source === "reviewer" ? "reviewer (changed from the bill)" : "bill"} · {s.los_days} day{s.los_days === 1 ? "" : "s"}</p>
         {s.diagnoses?.length > 0 && (
           <div className="tbl-wrap"><table>
             <thead><tr><th>Diagnosis</th><th>Meaning</th><th>Level</th></tr></thead>

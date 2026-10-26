@@ -29,7 +29,11 @@ export class ApiError extends Error {
 
 function messageFrom(data, status) {
   if (!data) return status >= 500 ? "The server had a problem. Try again in a minute." : `Request failed (${status}).`;
-  if (typeof data === "string") return data;
+  if (typeof data === "string") {
+    // An HTML error page from the server: show a plain message, not the markup.
+    if (/^\s*<(!doctype|html)/i.test(data)) return status >= 500 ? "The server had a problem. Check the backend window for the error." : `Request failed (${status}).`;
+    return data;
+  }
   if (data.detail) return data.detail;
   const first = Object.entries(data).find(([, v]) => v);
   if (first) return `${first[0].replace(/_/g, " ")}: ${Array.isArray(first[1]) ? first[1][0] : first[1]}`;
@@ -64,7 +68,8 @@ async function raw(path, { method = "GET", body, form, headers = {}, retry = tru
   } catch {
     throw new ApiError(0, "Cannot reach the server. Check your connection.");
   }
-  if (res.status === 401 && retry && session?.refresh && !path.startsWith("/api/auth/")) {
+  const noRefresh = path.startsWith("/api/auth/login/") || path.startsWith("/api/auth/refresh/");
+  if (res.status === 401 && retry && session?.refresh && !noRefresh) {
     if (await refresh()) return raw(path, { method, body, form, headers, retry: false });
     save(null); onLogout();
     throw new ApiError(401, "Your session has ended. Please sign in again.");

@@ -40,4 +40,4 @@ const STAFF_STATUS = {
   sent: ["Sent", "p-good"],
 };
 export const statusStaff = (s) => STAFF_STATUS[s] || [s || "Unknown", "p-mute"];
-export const statusFirm = (s) => (s === "sent" ? ["Ready", "p-good"] : ["In progress", "p-mute"]);
+export const statusFirm = (s) => (s === "sent" ? ["Ready", "p-good"] : s === "error" ? ["Needs attention", "p-warn"] : ["In progress", "p-mute"]);

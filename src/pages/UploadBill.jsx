@@ -125,7 +125,7 @@ export default function UploadBill() {
         </div>
         <div className="panel">
           <h2>Files</h2>
-          <FilePick id="bill" label="Itemized bill" hint="UB-04 or itemized statement · PDF or image · up to 50 MB" file={bill} setFile={setBill} required />
+          <FilePick id="bill" label="Itemized bill" hint="UB-04 or itemized statement · a PDF from the hospital's billing system reads best; a scan or photo is checked by hand · up to 50 MB" file={bill} setFile={setBill} required />
           <FilePick id="eob" label="EOB from the insurer" hint="Shows what the insurer actually paid" file={eob} setFile={setEob} />
           {!eob && <div className="callout info">With the EOB, the report can also show what the insurer actually paid for this bill.</div>}
         </div>
