@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Cases } from "../../api/endpoints.js";
 import { Empty, ErrorBox, Loading, useLoad } from "../../components/States.jsx";
-import { ActionButton, Bars, Pill } from "../../components/UI.jsx";
-import { date, money, ratio, shortHash } from "../../utils/format.js";
+import { ActionButton, Bars, FileName, Hash, Pill } from "../../components/UI.jsx";
+import { date, money, ratio } from "../../utils/format.js";
 import CaseHeader from "./CaseHeader.jsx";
 
 const LEVEL = { principal: ["Principal", "p-info"], mcc: ["MCC", "p-bad"], cc: ["CC", "p-warn"], other: ["Other", "p-mute"] };
@@ -82,9 +82,9 @@ function LineDetail({ l, payer }) {
         <div><span className="label">Hospital cost</span><div className="num">{money(l.cost)}</div></div>
       </div>
       {l.sources?.length > 0 && (
-        <div className="tbl-wrap"><table className="sources">
+        <div className="tbl-wrap"><table className="sources"><colgroup><col className="c-data" /><col className="c-file" /><col className="c-hash" /></colgroup>
           <thead><tr><th>Source</th><th>File</th><th>SHA-256</th></tr></thead>
-          <tbody>{l.sources.map((s, i) => <tr key={i}><td>{s.label}</td><td className="mono wrap">{s.file_name}</td><td className="hash">{shortHash(s.sha256)}</td></tr>)}</tbody>
+          <tbody>{l.sources.map((s, i) => <tr key={i}><td>{s.label}</td><td className="file"><FileName name={s.file_name} /></td><td className="hash"><Hash value={s.sha256} /></td></tr>)}</tbody>
         </table></div>
       )}
     </div>

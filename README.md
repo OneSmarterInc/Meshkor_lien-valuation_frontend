@@ -109,7 +109,7 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 | `needs_review` | Needs review | In progress |
 | `returned` | Sent back | In progress |
 | `no_price_file` | No price file | In progress |
-| `error` | Error (with the reason) | In progress |
+| `error` | Error (with the reason) | Needs attention ("MeshKor is looking at this bill") |
 | `sent` | Sent | **Ready** (downloads open) |
 
 ---
@@ -131,6 +131,7 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 **Values on screen:**
 
 - `*` or **est.** means **estimate**: a percentage contract, a "% of Medicare" term, or a price file that does not cover the date of service.
+- A firm user sees the values, lines and report only after MeshKor releases the case. Before that, the case shows **In progress** (or **Needs attention**).
 - **"not posted"** means the hospital posts no cash price. It is never shown as $0.
 - **"packaged"** means Medicare pays that line inside another line.
 
@@ -303,7 +304,6 @@ Keep the app free of sample data. When the backend has nothing to show, the page
 
 | Item | Note |
 |---|---|
-| Estimate text on the Review page | The note under "estimate" basis describes a ratio × Medicare method. The backend now uses the nearest price file's rates, marked as estimates. Update the text to match. |
 | Admin pages | Make users and firms from the portal instead of the command line |
 | Designed PDF report | Today the PDF is a simple one-column layout from the backend |
 | Upload progress | A progress bar for large files |

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Cases } from "../../api/endpoints.js";
 import { ErrorBox, Loading, useLoad } from "../../components/States.jsx";
-import { ActionButton } from "../../components/UI.jsx";
+import { ActionButton, FileName, Hash } from "../../components/UI.jsx";
 import { date, dateTime, money, range } from "../../utils/format.js";
 import CaseHeader from "./CaseHeader.jsx";
 
@@ -47,9 +47,9 @@ function ReportDoc({ c, r }) {
       </table></div>
 
       <h3>3. Sources</h3>
-      <div className="tbl-wrap"><table className="sources">
+      <div className="tbl-wrap"><table className="sources"><colgroup><col className="c-data" /><col className="c-file" /><col className="c-dated" /><col className="c-hash" /></colgroup>
         <thead><tr><th>Data</th><th>File</th><th>Dated</th><th>SHA-256</th></tr></thead>
-        <tbody>{(r.sources || []).map((s, i) => <tr key={i}><td>{s.data}</td><td className="mono wrap">{s.file_name}</td><td className="mono">{date(s.dated)}</td><td className="hash">{s.sha256}</td></tr>)}</tbody>
+        <tbody>{(r.sources || []).map((s, i) => <tr key={i}><td>{s.data}</td><td className="file"><FileName name={s.file_name} /></td><td className="mono dated">{date(s.dated)}</td><td className="hash"><Hash value={s.sha256} /></td></tr>)}</tbody>
       </table></div>
 
       {r.method && <><h3>4. Method</h3><p>{r.method}</p></>}

@@ -5,6 +5,23 @@ export function Pill({ children, tone = "p-mute" }) {
   return <span className={`pill ${tone}`}>{children}</span>;
 }
 
+// A long file name, with break points after _ - . \ / and commas, so it wraps between words, never inside one.
+export function FileName({ name }) {
+  if (!name) return "–";
+  const parts = String(name).split(/(?<=[_\-.\\/,])/);
+  return <>{parts.map((p, i) => <span key={i}>{p}{i < parts.length - 1 && <wbr />}</span>)}</>;
+}
+
+// A SHA-256 shown short (first 10 … last 4); the full value is in the tooltip and is copied on click.
+export function Hash({ value }) {
+  if (!value) return "–";
+  const short = `${value.slice(0, 10)}…${value.slice(-4)}`;
+  return (
+    <span title={`${value} (click to copy)`} style={{ cursor: "copy" }}
+      onClick={() => { try { navigator.clipboard?.writeText(value); } catch { /* clipboard blocked */ } }}>{short}</span>
+  );
+}
+
 export function Stat({ label, value, note }) {
   return (
     <div className="stat">
