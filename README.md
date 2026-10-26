@@ -76,7 +76,7 @@ On screen, a case has **3 steps: 1 Upload → 2 Review → 3 Report & send.**
 
 **Step 1: Upload** (law firm, or MeshKor staff for a firm)
 
-1. Choose the itemized bill (UB-04 or itemized statement: PDF or image, up to 50 MB). Add the insurer's EOB if you have it.
+1. Choose the itemized bill (UB-04 or itemized statement: PDF, Word .docx, JPG or PNG, up to 50 MB). Add the insurer's EOB if you have it. A PDF from the hospital is read exactly; a scan or photo is read by OCR, and MeshKor checks every OCR line.
 2. Enter your matter reference and choose who the report is for: plaintiff, defense or lien resolution.
 3. Tick **"client consented"**.
 4. Send. The backend encrypts the files, gives the case a number (`MK-2026-0001`) and prices the bill at once.
@@ -280,7 +280,7 @@ Keep the app free of sample data. When the backend has nothing to show, the page
 | "The server had a problem. Try again in a minute." | The backend is not running, or it stopped with an error | Look at backend Window 1. Start it again; if it stops by itself, run `runserver 8000 --noreload` and read the error. |
 | Sign-in says "Wrong email or password." | Wrong details, or the user does not exist | Make or reset the user with `create_portal_user` in the backend |
 | Every page sends you back to sign-in | The refresh token expired (12 hours by default), or the tab was closed | Sign in again |
-| A case stays "Error" | The bill has no text layer (a scan), or the hospital was not found | Open the case: the reason is shown. See the backend README, section 13. |
+| A case stays "Error" | The file could not be read (too blurred, or an unknown layout), or the hospital was not found | Open the case: the reason is shown. A sharper photo or the hospital's PDF usually helps. See the backend README, section 13. |
 | A case stays "No price file" | That hospital's price file is not loaded yet | Load it in the backend, then run `reprocess_case` |
 | `npm` is not recognized | Node.js is not installed, or the window is older than the install | Install Node.js LTS, then open a new window |
 | Downloads save without a proper name (production) | CORS does not expose `Content-Disposition` | Expose that header in the backend CORS settings |

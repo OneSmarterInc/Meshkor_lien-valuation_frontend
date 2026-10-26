@@ -6,7 +6,9 @@ import { isStaff, useAuth } from "../auth/AuthContext.jsx";
 import { useToast } from "../components/Toast.jsx";
 import { bytes } from "../utils/format.js";
 
-const OK_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/tiff"];
+const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const OK_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/tiff", DOCX];
+const OK_EXT = /\.(pdf|jpe?g|png|tiff?|docx)$/i;      // some browsers send no type for .docx
 const MAX = 50 * 1024 * 1024;
 
 function FilePick({ id, label, hint, file, setFile, required }) {
@@ -15,7 +17,7 @@ function FilePick({ id, label, hint, file, setFile, required }) {
   const [err, setErr] = useState(null);
   const take = (f) => {
     if (!f) return;
-    if (!OK_TYPES.includes(f.type)) return setErr("Use a PDF, JPG, PNG or TIFF file.");
+    if (!OK_TYPES.includes(f.type) && !OK_EXT.test(f.name || "")) return setErr("Use a PDF, Word (.docx), JPG or PNG file.");
     if (f.size > MAX) return setErr("The file is larger than 50 MB.");
     setErr(null); setFile(f);
   };
@@ -40,7 +42,7 @@ function FilePick({ id, label, hint, file, setFile, required }) {
             <button type="button" className="btn" onClick={() => ref.current.click()}>Choose file</button>
           </>
         )}
-        <input ref={ref} id={id} type="file" hidden accept=".pdf,.jpg,.jpeg,.png,.tif,.tiff" onChange={(e) => take(e.target.files[0])} />
+        <input ref={ref} id={id} type="file" hidden accept=".pdf,.docx,.jpg,.jpeg,.png,.tif,.tiff" onChange={(e) => take(e.target.files[0])} />
       </div>
       {err && <span className="field-err">{err}</span>}
     </div>
@@ -125,7 +127,7 @@ export default function UploadBill() {
         </div>
         <div className="panel">
           <h2>Files</h2>
-          <FilePick id="bill" label="Itemized bill" hint="UB-04 or itemized statement · a PDF from the hospital's billing system reads best; a scan or photo is checked by hand · up to 50 MB" file={bill} setFile={setBill} required />
+          <FilePick id="bill" label="Itemized bill" hint="UB-04 or itemized statement · PDF, Word (.docx), JPG or PNG · up to 50 MB. A PDF from the hospital reads exactly; a scan or photo is read by OCR and checked by MeshKor" file={bill} setFile={setBill} required />
           <FilePick id="eob" label="EOB from the insurer" hint="Shows what the insurer actually paid" file={eob} setFile={setEob} />
           {!eob && <div className="callout info">With the EOB, the report can also show what the insurer actually paid for this bill.</div>}
         </div>
