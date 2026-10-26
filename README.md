@@ -46,8 +46,8 @@ All reading, matching and pricing happens in the backend, **[Meshkor_lien-valuat
 
 | Item | Value |
 |---|---|
-| Framework | React 18.3.1, React Router 6.28.0 |
-| Build tool | Vite 5.4.11 (dev server on port 5173) |
+| Framework | React 18.3.1, React Router 7.18.4 |
+| Build tool | Vite 6.4.4 (dev server on port 5173) |
 | Styles | One plain CSS file (`src/styles.css`), light and dark mode, no CSS framework |
 | Login | JWT (Bearer token) from the backend, with one automatic refresh when it expires |
 | Other libraries | None. There is no state library and no UI kit. |
@@ -147,7 +147,7 @@ cd D:\Meshkor
 git clone https://github.com/OneSmarterInc/Meshkor_lien-valuation_frontend.git lien-portal-frontend
 cd lien-portal-frontend
 copy .env.example .env        # the defaults work when the backend is on http://localhost:8000
-npm install
+npm ci
 npm run dev
 ```
 
@@ -162,7 +162,7 @@ Open **http://localhost:5173** and sign in with an account made in the backend.
 
 **Try the full flow** with the synthetic test bill `tests\fixtures\test_bills\B01_TEST_bill.pdf` from the backend repository. Use only the synthetic test bills until the portal is set up for production. **No real bills on a developer PC.**
 
-**About `npm audit` warnings:** they are in the development tools (Vite and esbuild), not in the code the browser gets. **Do not run `npm audit fix --force`.** It jumps to new major versions and can break the build. Update versions on purpose, then test.
+**`npm audit`:** 0 vulnerabilities on October 26, 2026 (React Router 7.18.4, Vite 6.4.4). Check again after every `npm install`. **Do not run `npm audit fix --force`:** it can jump to new major versions without a test. Update one package on purpose, run `npm run build`, click through the pages, then commit `package.json` and `package-lock.json` together. Use `npm ci` (not `npm install`) on a new PC: it installs exactly the versions in `package-lock.json`.
 
 ---
 
@@ -308,5 +308,4 @@ Keep the app free of sample data. When the backend has nothing to show, the page
 | Admin pages | Make users and firms from the portal instead of the command line |
 | Designed PDF report | Today the PDF is a simple one-column layout from the backend |
 | Upload progress | A progress bar for large files |
-| Dependency updates | Update Vite and plugins on purpose, then test the build |
 | Production | Build with `VITE_API_BASE_URL`, serve over HTTPS, same domain as the API if possible |
