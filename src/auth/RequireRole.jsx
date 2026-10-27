@@ -8,6 +8,7 @@ export default function RequireRole({ roles, children }) {
   const loc = useLocation();
   if (checking) return <Loading text="Checking your session" />;
   if (!user) return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
+  if (user.must_change_password && loc.pathname !== "/password") return <Navigate to="/password" replace />;
   if (roles && !roles.includes(user.role)) return <Navigate to={homeFor(user)} replace />;
   return children;
 }

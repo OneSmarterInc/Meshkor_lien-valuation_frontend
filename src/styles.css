@@ -186,3 +186,15 @@ table.sources col.c-data{width:32%}
 table.sources col.c-file{width:auto}
 table.sources col.c-dated{width:110px}
 table.sources col.c-hash{width:150px}
+
+/* Admin pages */
+.btn.small{padding:4px 10px;font-size:12.5px}
+.nowrap{white-space:nowrap}
+.row.wrap-ok{flex-wrap:wrap;gap:8px}
+.row.wrap-ok input,.row.wrap-ok select{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:6px 8px;min-width:0}
+.row.wrap-ok input{flex:1 1 220px}
+.panel.narrow{max-width:520px;display:flex;flex-direction:column;gap:14px}
+.edit-row{display:flex;flex-direction:column;gap:10px;padding:6px 0}
+.temp-pw{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+.temp-pw .pw{font-size:18px;padding:6px 12px;border:1px dashed var(--line);border-radius:var(--r);background:var(--panel);user-select:all;letter-spacing:.5px}
+.bad-text{color:var(--bad, #b42318)}

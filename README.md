@@ -126,6 +126,10 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 | `/cases/:id/report` | **Report & send** (step 3) | staff | Report preview (summary table, method, limits, sources) · PDF and CSV download · Approve and send · Send back with a note. |
 | `/data-sources` | **Data sources** | staff | Every reference table (Medicare, labs, drugs, DRGs, cost reports…) with its release, row count and load state; the hospital price files loaded; the latest verify result. |
 | `/audit` | **Audit log** | staff | Every action (sign-in, upload, view, flag decision, approval, download) with time, person and case. |
+| `/admin/firms` | **Law firms** | admin | Add, rename, set the report email, turn a firm off or on. Users and cases per firm. |
+| `/admin/users` | **Users** | admin | Add a user (one-time temporary password shown once, with Copy), edit role, firm, name and email, reset the password, turn off or on. Filters by role and firm. |
+| `/admin/payer-names` | **Payer names** | admin | Insurer names the payer list did not know (cases, open cases); pick a payer group; price the open cases again; names added so far. |
+| `/password` | **Change password** | everyone | Own password. Shown alone, with no menu, while the account still has a temporary password. |
 | anything else | **Page not found** | everyone | A link back to the user's start page |
 
 **Values on screen:**

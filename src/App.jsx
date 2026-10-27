@@ -12,6 +12,10 @@ import Report from "./pages/staff/Report.jsx";
 import DataSources from "./pages/staff/DataSources.jsx";
 import AuditLog from "./pages/staff/AuditLog.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import ChangePassword from "./pages/ChangePassword.jsx";
+import Firms from "./pages/admin/Firms.jsx";
+import Users from "./pages/admin/Users.jsx";
+import PayerNames from "./pages/admin/PayerNames.jsx";
 
 function Home() {
   const { user, checking } = useAuth();
@@ -33,6 +37,10 @@ export default function App() {
         <Route path="/cases/:id/report" element={<RequireRole roles={STAFF}><Report /></RequireRole>} />
         <Route path="/data-sources" element={<RequireRole roles={STAFF}><DataSources /></RequireRole>} />
         <Route path="/audit" element={<RequireRole roles={STAFF}><AuditLog /></RequireRole>} />
+        <Route path="/password" element={<ChangePassword />} />
+        <Route path="/admin/firms" element={<RequireRole roles={["admin"]}><Firms /></RequireRole>} />
+        <Route path="/admin/users" element={<RequireRole roles={["admin"]}><Users /></RequireRole>} />
+        <Route path="/admin/payer-names" element={<RequireRole roles={["admin"]}><PayerNames /></RequireRole>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

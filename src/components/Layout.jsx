@@ -1,8 +1,11 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { isStaff, useAuth } from "../auth/AuthContext.jsx";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { isAdmin, isStaff, useAuth } from "../auth/AuthContext.jsx";
 
 const STAFF_NAV = [
   ["Workspace", [["/cases", "Cases"], ["/upload", "Upload a bill"], ["/data-sources", "Data sources"], ["/audit", "Audit log"]]],
+];
+const ADMIN_NAV = [
+  ["Admin", [["/admin/firms", "Law firms"], ["/admin/users", "Users"], ["/admin/payer-names", "Payer names"]]],
 ];
 const FIRM_NAV = [
   ["Your firm", [["/upload", "Upload a bill"], ["/my-reports", "My reports"]]],
@@ -13,7 +16,7 @@ const initials = (name = "") => name.split(/\s+/).filter(Boolean).slice(0, 2).ma
 export default function Layout() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
-  const groups = isStaff(user) ? STAFF_NAV : FIRM_NAV;
+  const groups = user.must_change_password ? [] : isAdmin(user) ? [...STAFF_NAV, ...ADMIN_NAV] : isStaff(user) ? STAFF_NAV : FIRM_NAV;
   const items = groups.flatMap((g) => g[1]);
   const signOut = async () => { await logout(); nav("/login", { replace: true }); };
 
@@ -48,6 +51,7 @@ export default function Layout() {
             <strong>{user.name}</strong>
             <span className="note">{user.firm ? user.firm.name : "MeshKor " + user.role}</span>
             {!isStaff(user) && <span className="note">You see only your firm's cases.</span>}
+            <Link className="note" to="/password">Change password</Link>
           </div>
         </aside>
         <main><div className="wrap"><Outlet /></div></main>
