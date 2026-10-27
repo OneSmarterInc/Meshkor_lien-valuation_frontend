@@ -12,6 +12,11 @@ export const Auth = {
   login: (email, password) => api("/api/auth/login/", { method: "POST", body: { email, password } }),
   me: () => api("/api/auth/me/"),
   logout: (refresh) => api("/api/auth/logout/", { method: "POST", body: { refresh } }),
+  mfaSetup: (mfa_token) => api("/api/auth/mfa/setup/", { method: "POST", body: { mfa_token } }),
+  mfaConfirm: (mfa_token, code) => api("/api/auth/mfa/confirm/", { method: "POST", body: { mfa_token, code } }),
+  mfaVerify: (mfa_token, code) => api("/api/auth/mfa/verify/", { method: "POST", body: { mfa_token, code } }),
+  mfaStatus: () => api("/api/auth/mfa/"),
+  newRecoveryCodes: (code) => api("/api/auth/mfa/recovery-codes/", { method: "POST", body: { code } }),
   changePassword: (current_password, new_password) => api("/api/auth/password/", { method: "POST", body: { current_password, new_password } }),
 };
 
@@ -43,6 +48,7 @@ export const Admin = {
   users: (params) => api(`/api/admin/users/${qs(params)}`),
   addUser: (body) => api("/api/admin/users/", { method: "POST", body }),
   updateUser: (id, body) => api(`/api/admin/users/${id}/`, { method: "PATCH", body }),
+  resetMfa: (id) => api(`/api/admin/users/${id}/reset-2fa/`, { method: "POST" }),
   resetPassword: (id) => api(`/api/admin/users/${id}/reset-password/`, { method: "POST" }),
   payerNames: () => api("/api/admin/payer-names/"),
   addPayerName: (name, group) => api("/api/admin/payer-names/", { method: "POST", body: { name, group } }),

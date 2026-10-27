@@ -23,12 +23,20 @@ export function AuthProvider({ children }) {
 
   useEffect(() => { auth.onLogout(() => setUser(null)); }, []);
 
-  const login = useCallback(async (email, password) => {
-    const d = await Auth.login(email, password);
+  // Store a finished sign-in (tokens + user).
+  const finish = useCallback((d) => {
     auth.set({ access: d.access, refresh: d.refresh, user: d.user });
     setUser(d.user);
     return d.user;
   }, []);
+
+  // Step 1: email and password. Returns the user, or {mfa: "setup"|"verify", mfa_token} when a
+  // Google Authenticator code is needed (every role, accounts/mfa.py on the server).
+  const login = useCallback(async (email, password) => {
+    const d = await Auth.login(email, password);
+    if (d.mfa) return { mfa: d.mfa, mfa_token: d.mfa_token };
+    return finish(d);
+  }, [finish]);
 
   const logout = useCallback(async () => {
     const r = auth.get()?.refresh;
@@ -40,7 +48,7 @@ export function AuthProvider({ children }) {
   // After a password change: keep the session, take the new user object.
   const updateUser = useCallback((u) => { auth.set({ ...auth.get(), user: u }); setUser(u); }, []);
 
-  const value = useMemo(() => ({ user, checking, login, logout, updateUser }), [user, checking, login, logout, updateUser]);
+  const value = useMemo(() => ({ user, checking, login, finish, logout, updateUser }), [user, checking, login, finish, logout, updateUser]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

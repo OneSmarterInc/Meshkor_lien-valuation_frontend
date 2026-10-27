@@ -68,7 +68,7 @@ async function raw(path, { method = "GET", body, form, headers = {}, retry = tru
   } catch {
     throw new ApiError(0, "Cannot reach the server. Check your connection.");
   }
-  const noRefresh = path.startsWith("/api/auth/login/") || path.startsWith("/api/auth/refresh/");
+  const noRefresh = /^\/api\/auth\/(login|refresh|mfa\/(setup|confirm|verify))\//.test(path);   // steps of a sign-in
   if (res.status === 401 && retry && session?.refresh && !noRefresh) {
     if (await refresh()) return raw(path, { method, body, form, headers, retry: false });
     save(null); onLogout();

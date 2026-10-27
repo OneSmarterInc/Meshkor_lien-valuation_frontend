@@ -93,6 +93,10 @@ export default function Users() {
     try { const r = await Admin.resetPassword(u.id); setTemp({ who: u.email, pw: r.temporary_password }); toast(`${u.email} is signed out everywhere.`); }
     catch (err) { toast(err.message, "error"); }
   };
+  const resetMfa = async (u) => {
+    try { put(await Admin.resetMfa(u.id)); toast(`Two-step sign-in reset for ${u.email}. They set it up again at the next sign-in.`); }
+    catch (err) { toast(err.message, "error"); }
+  };
   const toggle = async (u) => {
     try { put(await Admin.updateUser(u.id, { active: !u.active })); toast(u.active ? `${u.email} is turned off and signed out.` : `${u.email} is on again.`); }
     catch (err) { toast(err.message, "error"); }
@@ -102,7 +106,7 @@ export default function Users() {
 
   return (
     <section className="view">
-      <div className="head"><div><h1>Users</h1><p>Everyone who can sign in. A new user gets a temporary password and must choose their own at the first sign-in. Every change is in the audit log.</p></div></div>
+      <div className="head"><div><h1>Users</h1><p>Everyone who can sign in. A new user gets a temporary password, sets up Google Authenticator and chooses their own password at the first sign-in. Every change is in the audit log.</p></div></div>
       {temp && <TempPassword {...temp} onClose={() => setTemp(null)} />}
       <UserForm firms={fl} onDone={added} />
       <div className="panel">
@@ -121,9 +125,9 @@ export default function Users() {
         {loading && !data && <Loading text="Loading users" />}
         {data && (data.length === 0 ? <Empty title="No users match." /> : (
           <div className="tbl-wrap"><table>
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Firm</th><th>Last sign-in</th><th>Status</th><th /></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Firm</th><th>Last sign-in</th><th>2FA</th><th>Status</th><th /></tr></thead>
             <tbody>{data.map((u) => (editing === u.id ? (
-              <tr key={u.id}><td colSpan="7"><UserForm user={u} firms={fl} onDone={(n) => { put(n); setEditing(null); }} onCancel={() => setEditing(null)} /></td></tr>
+              <tr key={u.id}><td colSpan="8"><UserForm user={u} firms={fl} onDone={(n) => { put(n); setEditing(null); }} onCancel={() => setEditing(null)} /></td></tr>
             ) : (
               <tr key={u.id}>
                 <td><strong>{u.name}</strong>{u.id === me.id && <span className="note"> (you)</span>}</td>
@@ -131,10 +135,12 @@ export default function Users() {
                 <td>{roleName(u.role)}</td>
                 <td>{u.firm?.name || <span className="note">MeshKor</span>}</td>
                 <td className="mono">{u.last_login ? dateTime(u.last_login) : <span className="note">never</span>}</td>
+                <td>{u.mfa_enabled ? <Pill tone="p-good">On</Pill> : <Pill tone="p-warn">Not set up</Pill>}</td>
                 <td>{!u.active ? <Pill tone="p-mute">Turned off</Pill> : u.must_change_password ? <Pill tone="p-warn">Temporary password</Pill> : <Pill tone="p-good">Active</Pill>}</td>
                 <td className="r nowrap">
                   <button className="btn small" onClick={() => setEditing(u.id)}>Edit</button>{" "}
                   <button className="btn small" onClick={() => reset(u)}>Reset password</button>{" "}
+                  {u.mfa_enabled && u.id !== me.id && <><button className="btn small" title="For a lost phone: they set up Google Authenticator again" onClick={() => resetMfa(u)}>Reset 2FA</button>{" "}</>}
                   {u.id !== me.id && <button className="btn small" onClick={() => toggle(u)}>{u.active ? "Turn off" : "Turn on"}</button>}
                 </td>
               </tr>

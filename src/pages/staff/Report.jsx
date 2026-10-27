@@ -67,6 +67,24 @@ function ReportDoc({ c, r }) {
   );
 }
 
+// A sent report is frozen on the server: every download gives these exact files (same SHA-256).
+function Released({ r }) {
+  return (
+    <div className="panel">
+      <div className="row between"><h2>Released report</h2><span className="note">released {dateTime(r.released_at)}</span></div>
+      <p className="note">This is the report exactly as it was sent. It does not change when the price files, the CMS tables or the portal change. Every download gives the same files.{r.note ? ` (${r.note}.)` : ""}</p>
+      <div className="tbl-wrap"><table className="sources"><colgroup><col className="c-data" /><col className="c-hash" /></colgroup>
+        <thead><tr><th>File</th><th>SHA-256 fingerprint</th></tr></thead>
+        <tbody>
+          <tr><td>PDF report</td><td className="hash"><Hash value={r.pdf_sha256} /></td></tr>
+          <tr><td>CSV data appendix</td><td className="hash"><Hash value={r.csv_sha256} /></td></tr>
+        </tbody>
+      </table></div>
+      <p className="note">To check a copy on Windows: <span className="mono">Get-FileHash MK-…_valuation_report.pdf</span> must show the same fingerprint.</p>
+    </div>
+  );
+}
+
 export default function Report() {
   const { id } = useParams();
   const kase = useLoad(() => Cases.get(id), [id]);
@@ -104,12 +122,13 @@ export default function Report() {
               <ActionButton disabled={!note.trim()} okText="Sent back to review"
                 action={async () => { const x = await Cases.sendBack(c.id, note.trim()); kase.setData((o) => ({ ...o, ...x })); }}>Send back</ActionButton>
               <ActionButton className="btn primary" okText={`Approved and sent to ${c.firm?.name}`}
-                action={async () => { const x = await Cases.approve(c.id, note.trim() || undefined); kase.setData((o) => ({ ...o, ...x })); rep.reload(); }}>Approve and send</ActionButton>
+                action={async () => { await Cases.approve(c.id, note.trim() || undefined); kase.reload(); rep.reload(); }}>Approve and send</ActionButton>
             </div>
           </div>
         </>
       )}
 
+      {sent && (rep.data?.released || c.released) && <Released r={rep.data?.released || c.released} />}
       <ErrorBox error={rep.error} onRetry={rep.reload} />
       {rep.loading && !rep.data && <Loading text="Building the report" />}
       {rep.data && <ReportDoc c={c} r={rep.data} />}

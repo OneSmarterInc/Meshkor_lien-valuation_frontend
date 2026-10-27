@@ -198,3 +198,14 @@ table.sources col.c-hash{width:150px}
 .temp-pw{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
 .temp-pw .pw{font-size:18px;padding:6px 12px;border:1px dashed var(--line);border-radius:var(--r);background:var(--panel);user-select:all;letter-spacing:.5px}
 .bad-text{color:var(--bad, #b42318)}
+
+/* Two-step sign-in */
+.login-card.wide-card{max-width:520px}
+.code-input{font-family:var(--f-num);font-size:22px;letter-spacing:6px;text-align:center;padding:10px 12px!important}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+.qr{display:flex;justify-content:center;padding:10px;margin:8px 0;background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+.qr img{display:block;image-rendering:pixelated}
+.key-box{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--soft);border-radius:var(--r)}
+.key-box code{font-size:15px;letter-spacing:1px;word-break:break-all;user-select:all}
+.recovery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;margin:6px 0;padding-left:22px;font-size:15px}
+.btn.ghost.wide{margin-top:-4px}

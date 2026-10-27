@@ -118,18 +118,18 @@ Staff also choose **which law firm** the bill belongs to. The case then shows in
 
 | Address | Page | Role | What it shows and does |
 |---|---|---|---|
-| `/login` | **Sign in** | everyone | Email and password. After sign-in, a firm user goes to My reports and staff go to Cases. |
+| `/login` | **Sign in** | everyone | Email and password, then the 6-digit Google Authenticator code. The first time: set-up with a QR code (or a typed key), then 10 recovery codes to save (Copy, Download .txt). "Use a recovery code" for a lost phone. After sign-in, a firm user goes to My reports and staff go to Cases. |
 | `/upload` | **Upload a bill** | firm, staff | Case details, consent box, bill and EOB file pickers. Staff also pick the law firm. |
 | `/my-reports` | **My reports** | firm | The firm's cases: matter, hospital, dates, billed total, status. PDF and CSV buttons when Ready. Feedback form for sent reports. |
 | `/cases` | **Cases** | staff | Counts (needs review, processing, sent this month, billed total of open cases), a status filter, search (case, matter, hospital, insurer), and the case list. |
 | `/cases/:id/review` | **Review** (step 2) | staff | Hospital match and price file · flags to resolve · bill total against each benchmark · bill lines (switch between "service date" and "estimate" basis) · line detail with every source file and its hash · the insurer's EOB (allowed, paid, patient share, lines matched; an "Allowed (EOB)" column in the lines) · for inpatient: DRG, diagnoses, stay value, confirm DRG. |
-| `/cases/:id/report` | **Report & send** (step 3) | staff | Report preview (summary table, method, limits, sources) · PDF and CSV download · Approve and send · Send back with a note. |
+| `/cases/:id/report` | **Report & send** (step 3) | staff | Report preview (summary table, method, limits, sources) · PDF and CSV download · Approve and send · Send back with a note · after sending: the **Released report** panel with the SHA-256 fingerprints of the frozen PDF and CSV. |
 | `/data-sources` | **Data sources** | staff | Every reference table (Medicare, labs, drugs, DRGs, cost reports…) with its release, row count and load state; the hospital price files loaded; the latest verify result. |
 | `/audit` | **Audit log** | staff | Every action (sign-in, upload, view, flag decision, approval, download) with time, person and case. |
 | `/admin/firms` | **Law firms** | admin | Add, rename, set the report email, turn a firm off or on. Users and cases per firm. |
 | `/admin/users` | **Users** | admin | Add a user (one-time temporary password shown once, with Copy), edit role, firm, name and email, reset the password, turn off or on. Filters by role and firm. |
 | `/admin/payer-names` | **Payer names** | admin | Insurer names the payer list did not know (cases, open cases); pick a payer group; price the open cases again; names added so far. |
-| `/password` | **Change password** | everyone | Own password. Shown alone, with no menu, while the account still has a temporary password. |
+| `/password` | **Password & 2FA** | everyone | Own password, and two-step sign-in: status, recovery codes left, make new recovery codes. Shown alone, with no menu, while the account still has a temporary password. |
 | anything else | **Page not found** | everyone | A link back to the user's start page |
 
 **Values on screen:**

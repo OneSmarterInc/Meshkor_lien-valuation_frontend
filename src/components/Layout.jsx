@@ -51,7 +51,7 @@ export default function Layout() {
             <strong>{user.name}</strong>
             <span className="note">{user.firm ? user.firm.name : "MeshKor " + user.role}</span>
             {!isStaff(user) && <span className="note">You see only your firm's cases.</span>}
-            <Link className="note" to="/password">Change password</Link>
+            <Link className="note" to="/password">Password &amp; 2FA</Link>
           </div>
         </aside>
         <main><div className="wrap"><Outlet /></div></main>
